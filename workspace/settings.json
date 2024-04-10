@@ -1,0 +1,13 @@
+{
+    "sqlite_path": "workspace/database.sqlite",
+
+    "scrypt": {
+        "salt_length": 32,
+        "hash_length": 32,
+        "params": {
+            "N": 16384,
+            "r": 8,
+            "p": 1
+        }
+    }
+}
