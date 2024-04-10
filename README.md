@@ -1,4 +1,4 @@
-> Simple account database that comes with **AES encryption** & **scrypt password hashing**.
+> Simple account database that comes with **aes encryption** & **scrypt password hashing**.
 
 ## Requirements
 * [Python 3.10+](https://www.python.org/downloads/)
