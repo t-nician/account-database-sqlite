@@ -6,9 +6,3 @@
 
 import database
 
-print(database.secure.scrypt_hash("password"))
-
-
-database.handler.create_account("username")
-
-print(database.handler.get_account("username"))

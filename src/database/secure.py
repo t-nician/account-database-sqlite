@@ -34,18 +34,20 @@ def scrypt_hash(
     Returns:
         tuple[bytes, bytes] | tuple[list[bytes], bytes]: hash, salt | list[hash], salt
     """
+    salt = salt_override or get_random_bytes(salt_length)
+
     return scrypt(
         password=password,
-        salt=salt_override or get_random_bytes(salt_length),
+        salt=salt,
         key_len=hash_length,
         N=N,
         r=r,
         p=p,
         num_keys=hash_amount
-    )
+    ), salt
 
 
-def aes_encrypt(key: bytes | str, data: bytes, nonce_override: bytes | None = None) -> tuple[bytes, bytes]:
+def aes_encrypt(key: bytes | str, data: bytes | str, nonce_override: bytes | None = None) -> tuple[bytes, bytes]:
     """Encrypt data with aes.
 
     Args:
@@ -56,6 +58,7 @@ def aes_encrypt(key: bytes | str, data: bytes, nonce_override: bytes | None = No
         tuple[bytes, bytes]: encrypted data, nonce.
     """
     key = type(key) is str and key.encode() or key
+    data = type(data) is str and data.encode() or data
 
     cipher = AES.new(key=key, mode=AES.MODE_EAX, nonce=nonce_override)
 
