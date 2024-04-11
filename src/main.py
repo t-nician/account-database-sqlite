@@ -6,6 +6,9 @@
 
 import database
 
-database.handler.create_account("username", "password")
+if database.handler.get_account("username") is None:
+    database.handler.create_account("username", "password")
 
-print(database.handler.get_account("username").scrypt_params)
+account = database.handler.get_account("username")
+
+print(account.get_and_decrypt_data("password"))

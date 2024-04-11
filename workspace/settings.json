@@ -1,5 +1,5 @@
 {
-    "sqlite_path": ":memory:",
+    "sqlite_path": "workspace/database.sqlite",
 
     "scrypt": {
         "salt_length": 32,

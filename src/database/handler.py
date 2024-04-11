@@ -7,6 +7,31 @@ class AccountHandler():
     def __init__(self, account: model.Account):
         self.account_model = account
         self.scrypt_params = json.loads(self.account_model.scrypt)
+        self.encrypted_data = json.loads(self.account_model.data)
+
+
+    def get_and_decrypt_data(self, password: str) -> bytes:
+        hashes, _ = secure.scrypt_hash(
+            password,
+            hash_length=var.SCRYPT_HASH_LENGTH,
+            hash_amount=2,
+            salt_override=bytes.fromhex(self.scrypt_params["salt"]),
+            N=self.scrypt_params["N"],
+            r=self.scrypt_params["r"],
+            p=self.scrypt_params["p"]
+        )
+
+        authorization_key, encryption_key = hashes[0], hashes[1]
+
+        if bytes.fromhex(self.account_model.password) != authorization_key:
+            raise Exception("Password does not match the accounts!")
+        
+        encrypted_data = bytes.fromhex(self.encrypted_data["data"])
+        aes_nonce = bytes.fromhex(self.encrypted_data["nonce"])
+
+        return secure.aes_decrypt(encryption_key, aes_nonce, encrypted_data)
+
+
 
 
 def get_account(username: str) -> AccountHandler | None:
@@ -18,9 +43,15 @@ def get_account(username: str) -> AccountHandler | None:
     Returns:
         AccountHandler | None: _description_
     """
-    account_model = model.Account.get(
-        model.Account.username == username
-    )
+
+    account_model: model.Account | None = None
+
+    try:
+        account_model = model.Account.get(
+            model.Account.username == username
+        )
+    except Exception:
+        pass
 
     if account_model is not None:
         return AccountHandler(account_model)
@@ -37,6 +68,9 @@ def create_account(username: str, password: str, email: str | None = None) -> Ac
     Returns:
         AccountHandler | None: _description_
     """
+    if get_account(username) is not None:
+        raise Exception("Account already exists!")
+
     hashes, salt = secure.scrypt_hash(
         password,
         hash_amount=2
